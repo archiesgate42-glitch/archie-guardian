@@ -1,0 +1,25 @@
+# Archie Guardian - Core Dependencies
+# Simplified & compatible versions (November 2025)
+
+# System Monitoring
+watchdog>=4.0.0
+psutil>=6.0.0
+
+# CLI & User Interface
+click>=8.1.0
+rich>=13.7.0
+pyyaml>=6.0.0
+
+# Logging & Utilities
+python-dotenv>=1.0.0
+colorama>=0.4.6
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+
+# Network monitoring
+scapy>=2.5.0
+
+# Additional useful libs
+requests>=2.31.0
