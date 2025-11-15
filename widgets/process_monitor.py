@@ -57,7 +57,7 @@ class ProcessMonitorWidget:
     def get_stats(self):
         return {
             "widget_name": "process_monitor",
-            "enabled": self.active,
-            "events_buffered": len(self.events),
+            "enabled": self.active,  # ✅ CORRECT (not self.enabled)
+            "events_buffered": len(self.events) if hasattr(self, 'events') else 0,
             "status": "🟢 LIVE" if self.active else "⭕ Idle"
-        }
+    }

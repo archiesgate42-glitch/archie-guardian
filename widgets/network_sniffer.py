@@ -57,9 +57,10 @@ class NetworkSnifferWidget:
         return self.events[-count:] if self.events else []
 
     def get_stats(self):
-        return {
-            "widget_name": "network_sniffer",
-            "enabled": self.active,
-            "events_buffered": len(self.events),
-            "status": "🟢 LIVE" if self.active else "⭕ Idle"
-        }
+     """Return widget status"""
+     return {
+        "widget_name": "network_sniffer",
+        "enabled": self.active,  # ✅ CORRECT (not self.enabled)
+        "events_buffered": len(self.events) if hasattr(self, 'events') else 0,
+        "status": "🟢 LIVE" if self.active else "⭕ Idle"
+    }

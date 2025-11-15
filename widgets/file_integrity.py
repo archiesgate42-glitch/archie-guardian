@@ -130,12 +130,18 @@ class FileIntegrityWidget:
             pass
         return 0
     
-    def get_stats(self) -> Dict[str, Any]:
-        """Return widget statistics."""
+    def get_actions(self):
+        """Available actions based on state"""
         return {
-            "widget_name": self.widget_name,
+            "actions": [],  # file_integrity has no direct actions
+            "status": "active" if self.enabled else "inactive"
+        }
+    
+    def get_stats(self):
+        """Return widget status (simplified for clean CLI output)"""
+        return {
+            "widget_name": "file_integrity",
             "enabled": self.enabled,
-            "watched_paths": self.watch_paths,
-            "events_buffered": len(self.events),
+            "events_buffered": len(self.events) if hasattr(self, 'events') else 0,
             "status": "🟢 LIVE" if self.enabled else "⭕ Idle"
         }
