@@ -1,7 +1,26 @@
 # Archie Guardian
 
+![Archie Guardian Logo](assets/logo.png)
+
 > **Local. Transparent. AI-Driven Security.**
 
+Real-time system monitoring with **File Integrity**, **Process Monitor**, and **Network Sniffer** widgets...
+
+---
+
+## 🏗️ System Architecture
+
+![Architecture Diagram](assets/architecture-diagram.png)
+
+The system follows a 4-layer design...
+
+---
+
+## 🚦 Roadmap Overview
+
+![Roadmap](assets/roadmap-overview.png)
+
+**v0.3 (NOW)** → **v1.0** → **v2.0+**
 Real-time system monitoring with **File Integrity**, **Process Monitor**, and **Network Sniffer** widgets. Powered by multi-agent AI orchestration (CrewAI) + local LLM inference (Ollama).
 
 ![status](https://img.shields.io/badge/status-MVP%20v0.3-blue)
