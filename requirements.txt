@@ -1,25 +1,45 @@
 # Archie Guardian - Core Dependencies
-# Simplified & compatible versions (November 2025)
+# Optimized for v1.0 - Multi-Agent + Ollama Integration (November 2025)
 
-# System Monitoring
-watchdog>=4.0.0
-psutil>=6.0.0
+# Python Version
+# Requires: Python 3.9+
 
-# CLI & User Interface
-click>=8.1.0
-rich>=13.7.0
-pyyaml>=6.0.0
+# ============================================================================
+# SYSTEM MONITORING & CORE
+# ============================================================================
+watchdog>=4.0.0          # File system event monitoring
+psutil>=6.0.0            # Process & system information
+requests>=2.31.0         # HTTP client (Ollama API)
 
-# Logging & Utilities
-python-dotenv>=1.0.0
-colorama>=0.4.6
+# ============================================================================
+# CLI & USER INTERFACE
+# ============================================================================
+click>=8.1.0             # CLI framework
+rich>=13.7.0             # Rich terminal output
+pyyaml>=6.0.0            # YAML configuration
 
-# Testing
+# ============================================================================
+# NETWORK MONITORING
+# ============================================================================
+scapy>=2.5.0             # Network packet capture & analysis
+
+# ============================================================================
+# LOGGING & UTILITIES
+# ============================================================================
+python-dotenv>=1.0.0     # Environment variable management
+colorama>=0.4.6          # Cross-platform colored terminal text
+
+# ============================================================================
+# AI & ORCHESTRATION
+# ============================================================================
+ollama>=0.1.0            # Ollama Python client [NEW! v1.0]
+# Note: Requires Ollama service running separately
+# Download from: https://ollama.ai
+
+# crewai>=0.0.1          # Multi-agent orchestration [v1.1+]
+# Uncomment when ready for CrewAI integration
+
+# ============================================================================
+# TESTING & DEVELOPMENT
+# ============================================================================
 pytest>=7.4.0
-pytest-cov>=4.1.0
-
-# Network monitoring
-scapy>=2.5.0
-
-# Additional useful libs
-requests>=2.31.0

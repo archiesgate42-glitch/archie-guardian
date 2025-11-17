@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 """
-guardian.py (MVP v1.0 - Widget Manager + Multi-Agent Orchestrator)
+guardian.py (MVP v1.0 - Widget Manager + Multi-Agent Orchestrator + Ollama Chat)
 Main entry point for Archie Guardian.
-Integrates: Widgets + OrchA (AI) + OrchB (Human) + Dispatcher + Master Orchestrator
+Integrates: Widgets + OrchA (AI) + OrchB (Human) + Dispatcher + Master Orchestrator + Ollama
 """
 
 import sys
@@ -22,6 +22,7 @@ widget_imports = {
     "network_sniffer": ("widgets.network_sniffer", "NetworkSnifferWidget"),
     "windows_defender": ("widgets.windows_defender", "WindowsDefenderWidget"),
     "rrnc": ("widgets.rrnc", "RapidResponseNeutralizeCapture"),
+    "ollama_chat": ("widgets.ollama_chat", "OllamaChatWidget"),  # NEW: Ollama as widget
 }
 
 # Try to import each widget
@@ -35,7 +36,6 @@ for widget_name, (module_path, class_name) in widget_imports.items():
         print(f"   ⚠️  {widget_name} not available: {e}")
 
 # Import orchestrator components
-# Import orchestrator components
 ORCHESTRATOR_AVAILABLE = False
 try:
     from core.agent_utils import AuditLogger, PermissionLevel, ThreatLevel
@@ -46,14 +46,13 @@ try:
     ORCHESTRATOR_AVAILABLE = True
 except ImportError as e:
     print(f"   ⚠️  orchestrator not available: {e}")
-    # Fallback: use simple audit logging
     class AuditLogger:
         def __init__(self, log_file):
             self.log_file = log_file
     ORCHESTRATOR_AVAILABLE = False
 
 print("=" * 60)
-print("✨ ARCHIE GUARDIAN v1.0 - Local AI Security + Multi-Agent Orchestration")
+print("✨ ARCHIE GUARDIAN v1.0 - Local AI Security + Multi-Agent Orchestration + Ollama")
 print("=" * 60)
 print()
 
@@ -89,13 +88,7 @@ try:
     print(f"   ✅ Widget system ready ({len(AVAILABLE_WIDGETS)}/{len(widget_imports)} widgets available)")
     
     print("[3/7] Initializing audit logger...")
-    # COMMENT THIS OUT FOR NOW (old API)
-    # audit_logger.log_decision(
-    #     agent="Guardian",
-    #     decision="startup",
-    #     details={"version": "1.0", "timestamp": datetime.now().isoformat()}
-    # )
-    log_event("STARTUP", "Guardian v1.0 initialized")
+    log_event("STARTUP", "Guardian v1.0 initialized with Ollama integration")
     print("   ✅ Audit logger initialized (logs/audit.log)")
 
     print("[4/7] Initializing widget instances...")
@@ -110,7 +103,7 @@ try:
     if ORCHESTRATOR_AVAILABLE:
         master_orch = MasterOrchestrator(
             audit_logger,
-            dispatcher=None,  # TODO: integrate dispatcher
+            dispatcher=None,
             config={
                 "orcha_config": {},
                 "orchb_config": {}
@@ -133,7 +126,7 @@ except Exception as e:
     sys.exit(1)
 
 # ============================================================================
-# CLI FUNCTIONS (v0.5 Compatibility)
+# CLI FUNCTIONS (v1.0 - With Ollama Chat)
 # ============================================================================
 
 def main_menu():
@@ -141,6 +134,7 @@ def main_menu():
     print("╔════════════════════════════════════════════════════╗")
     print("║     ARCHIE GUARDIAN v1.0 - MAIN MENU              ║")
     print("║  Widget Manager + Multi-Agent Orchestration       ║")
+    print("║  + Local AI Chat (Ollama)                         ║")
     print("╚════════════════════════════════════════════════════╝")
     print()
     print("Commands:")
@@ -153,6 +147,7 @@ def main_menu():
     print("  7. orch_stats  - Show orchestrator statistics")
     print("  8. set_perms   - Set user permission level")
     print("  9. help        - Show help")
+    print("  10. chat       - Interactive Ollama chat (NEW!)")
     print("  0. quit        - Exit Guardian")
     print()
 
@@ -161,7 +156,7 @@ def show_status():
     print("\n📊 GUARDIAN STATUS")
     print("=" * 50)
     print("Status: ✅ OPERATIONAL")
-    print("Version: 1.0 (Multi-Agent Orchestration)")
+    print("Version: 1.0 (Multi-Agent Orchestration + Ollama)")
     print(f"Permission Level: {master_orch.orchb.permission_level.value.upper() if master_orch else 'N/A'}")
     print()
     print("Widgets:")
@@ -172,15 +167,28 @@ def show_status():
         
         if widget_name in widgets_instances and enabled:
             widget = widgets_instances[widget_name]
-            if hasattr(widget, 'get_stats'):
-                try:
-                    stats = widget.get_stats()
-                    events = stats.get("events_buffered", 0)
-                    print(f"  {status_icon} {widget_name:<20} - LIVE ({events} events)")
-                except Exception as e:
-                    print(f"  {status_icon} {widget_name:<20} - LIVE (error: {e})")
+            
+            # Special handling for ollama_chat
+            if widget_name == "ollama_chat":
+                if hasattr(widget, 'get_status'):
+                    try:
+                        stats = widget.get_status()
+                        model = stats.get("model", "unknown")
+                        print(f"  {status_icon} {widget_name:<20} - LIVE ({model})")
+                    except:
+                        print(f"  {status_icon} {widget_name:<20} - LIVE")
+                else:
+                    print(f"  {status_icon} {widget_name:<20} - LIVE")
             else:
-                print(f"  {status_icon} {widget_name:<20} - LIVE")
+                if hasattr(widget, 'get_stats'):
+                    try:
+                        stats = widget.get_stats()
+                        events = stats.get("events_buffered", 0)
+                        print(f"  {status_icon} {widget_name:<20} - LIVE ({events} events)")
+                    except Exception as e:
+                        print(f"  {status_icon} {widget_name:<20} - LIVE (error: {e})")
+                else:
+                    print(f"  {status_icon} {widget_name:<20} - LIVE")
         else:
             print(f"  {status_icon} {widget_name:<20} - Idle")
     
@@ -216,27 +224,21 @@ def enable_widget_menu():
     widgets_to_enable = []
     
     try:
-        # Handle range input (1-3)
         if "-" in selection:
             start, end = selection.split("-")
             start, end = int(start.strip()), int(end.strip())
             for i in range(start - 1, end):
                 if 0 <= i < len(available_widgets):
                     widgets_to_enable.append(available_widgets[i])
-        
-        # Handle comma-separated input (1,2,3)
         elif "," in selection:
             for num in selection.split(","):
                 idx = int(num.strip()) - 1
                 if 0 <= idx < len(available_widgets):
                     widgets_to_enable.append(available_widgets[idx])
-        
-        # Handle single input
         else:
             idx = int(selection) - 1
             if 0 <= idx < len(available_widgets):
                 widgets_to_enable.append(available_widgets[idx])
-    
     except ValueError:
         print("❌ Invalid input. Use numbers (1, 2, 3) or ranges (1-3)\n")
         return
@@ -269,43 +271,34 @@ def disable_widget_menu():
         print("❌ No active widgets to disable.\n")
         return
     
-    # Show options
     print("Active widgets:")
     for i, widget in enumerate(active_widgets, 1):
         print(f"  {i}. {widget}")
     
-    # Get selection
     selection = input("\nSelect widget(s) to disable (e.g. 1,2 or 1-2): ").strip()
     
     widgets_to_disable = []
     
     try:
-        # Handle range input (1-2)
         if "-" in selection:
             start, end = selection.split("-")
             start, end = int(start.strip()), int(end.strip())
             for i in range(start - 1, end):
                 if 0 <= i < len(active_widgets):
                     widgets_to_disable.append(active_widgets[i])
-        
-        # Handle comma-separated input (1,2)
         elif "," in selection:
             for num in selection.split(","):
                 idx = int(num.strip()) - 1
                 if 0 <= idx < len(active_widgets):
                     widgets_to_disable.append(active_widgets[idx])
-        
-        # Handle single input
         else:
             idx = int(selection) - 1
             if 0 <= idx < len(active_widgets):
                 widgets_to_disable.append(active_widgets[idx])
-    
     except ValueError:
         print("❌ Invalid input.\n")
         return
     
-    # Disable selected widgets
     for widget_name in widgets_to_disable:
         if widget_name in widgets_instances:
             widget = widgets_instances[widget_name]
@@ -323,7 +316,6 @@ def execute_action_menu():
     print("\n⚡ ACTION EXECUTION")
     print("=" * 60)
     
-    # Show active widgets
     active_widgets = [w for w in widget_state if widget_state[w]]
     if not active_widgets:
         print("❌ No active widgets. Enable one first.\n")
@@ -333,7 +325,6 @@ def execute_action_menu():
     for i, widget in enumerate(active_widgets, 1):
         print(f"  {i}. {widget}")
     
-    # Select widget
     widget_input = input("\nSelect widget (number): ").strip()
     try:
         widget_idx = int(widget_input) - 1
@@ -345,7 +336,6 @@ def execute_action_menu():
         print("❌ Invalid input (use number)\n")
         return
     
-    # Get available actions
     widget = widgets_instances[widget_name]
     if not hasattr(widget, 'get_actions'):
         print(f"❌ Widget '{widget_name}' does not support actions\n")
@@ -362,7 +352,6 @@ def execute_action_menu():
     for i, action in enumerate(actions, 1):
         print(f"  {i}. {action}")
     
-    # Select action
     action_input = input("\nSelect action (number): ").strip()
     try:
         action_idx = int(action_input) - 1
@@ -374,7 +363,6 @@ def execute_action_menu():
         print("❌ Invalid input (use number)\n")
         return
     
-    # Get parameters
     print(f"\nEnter parameters for '{action_name}':")
     print("Format: key=value (e.g. pid=1234 path=C:\\\\temp)")
     print("(Press Enter to skip)")
@@ -386,7 +374,6 @@ def execute_action_menu():
         for param in param_input.split():
             if "=" in param:
                 key, val = param.split("=", 1)
-                # Auto-type conversion
                 try:
                     kwargs[key.strip()] = int(val.strip())
                 except ValueError:
@@ -395,14 +382,12 @@ def execute_action_menu():
                     except ValueError:
                         kwargs[key.strip()] = val.strip()
     
-    # Execute action
     print(f"\n▶️  Executing {widget_name}.{action_name}({kwargs})...")
     
     try:
         action_method = getattr(widget, action_name)
         result = action_method(**kwargs)
         
-        # Log action
         log_event("ACTION_EXECUTED", f"{widget_name}.{action_name}({kwargs})")
         
         print("\n" + "=" * 60)
@@ -437,11 +422,10 @@ def show_events():
                     print(f"\n🔍 {widget_name.upper()}:")
                     print("-" * 60)
                     
-                    for event in events[-10:]:  # Show last 10
+                    for event in events[-10:]:
                         if isinstance(event, dict) and "timestamp" in event:
                             ts = datetime.fromtimestamp(event.get("timestamp", 0)).strftime("%H:%M:%S")
                             
-                            # Format based on widget type
                             if widget_name == "file_integrity":
                                 event_type = event.get("event_type", "unknown")
                                 path = event.get("path", "unknown")
@@ -468,6 +452,10 @@ def show_events():
                                 action = event.get("action", "unknown")
                                 status = event.get("status", "unknown")
                                 print(f"  [{ts}] {action:18} | {status}")
+                            
+                            elif widget_name == "ollama_chat":
+                                user = event.get("user", "user")[:30]
+                                print(f"  [{ts}] USER: {user}")
                         else:
                             print(f"  {event}")
                 
@@ -517,8 +505,6 @@ def show_orchestrator_stats():
     print("OrchB (Human-AI Bridge):")
     print(f"  Current permission: {stats['orchb_stats'].get('current_permission_level', 'N/A')}")
     print(f"  User decisions: {stats['orchb_stats'].get('user_decisions_count', 0)}")
-    approval = stats['orchb_stats'].get('approval_rate', 'N/A') if 'approval_rate' in stats.get('orchb_stats', {}) else 'N/A'
-    # Note: approval_rate would come from orchb.get_approval_stats()
     
     print()
     print("=" * 60 + "\n")
@@ -553,12 +539,49 @@ def set_permission_menu():
     else:
         print("❌ Invalid choice\n")
 
+def interactive_chat():
+    """NEW: Interactive chat with Ollama (command 10)."""
+    if "ollama_chat" not in widget_state or not widget_state["ollama_chat"]:
+        print("\n❌ Ollama chat widget not enabled. Enable it first (command 2)\n")
+        return
+    
+    ollama_widget = widgets_instances.get("ollama_chat")
+    if not ollama_widget:
+        print("\n❌ Ollama widget not initialized\n")
+        return
+    
+    print("\n💬 OLLAMA CHAT (type 'exit' or 'quit' to exit)")
+    print("=" * 60)
+    
+    while True:
+        try:
+            user_input = input("\n🧑 You: ").strip()
+            
+            if user_input.lower() in ["exit", "quit", "q"]:
+                print("✅ Chat ended\n")
+                break
+            
+            if not user_input:
+                continue
+            
+            print("\n⏳ Thinking...")
+            response = ollama_widget.send_message(user_input)
+            
+            print(f"\n🤖 Ollama:\n{response}\n")
+            log_event("CHAT_INTERACTION", f"User: {user_input[:50]}...")
+            
+        except KeyboardInterrupt:
+            print("\n✅ Chat interrupted\n")
+            break
+        except Exception as e:
+            print(f"\n❌ Error: {e}\n")
+
 def show_help():
     """Show help information."""
     print("""
-📚 ARCHIE GUARDIAN v1.0 HELP
+📚 ARCHIE GUARDIAN v1.0 HELP (WITH OLLAMA INTEGRATION)
 
-MVP v1.0 - Multi-Widget Manager + Human-AI Orchestration
+MVP v1.0 - Multi-Widget Manager + Human-AI Orchestration + Local LLM Chat
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -568,6 +591,7 @@ AVAILABLE WIDGETS:
   ✅ network_sniffer      - Network connection tracking
   ✅ windows_defender     - Windows Defender scan integration
   ✅ rrnc                 - Rapid Response Neutralize & Capture
+  ✅ ollama_chat          - Local AI chat (Llama3 powered) [NEW!]
 
 COMMANDS (numbered selection):
   1. status              - View system status & widget states
@@ -576,9 +600,10 @@ COMMANDS (numbered selection):
   4. action              - Execute widget action [numbered steps]
   5. events              - View live events from active widgets
   6. logs                - View audit trail
-  7. orch_stats          - Show orchestrator statistics (NEW!)
-  8. set_perms           - Set user permission level (NEW!)
+  7. orch_stats          - Show orchestrator statistics
+  8. set_perms           - Set user permission level
   9. help                - Show this help
+  10. chat               - Interactive Ollama chat [NEW!]
   0. quit                - Exit Guardian
 
 NEW IN v1.0:
@@ -586,30 +611,36 @@ NEW IN v1.0:
   🤝 OrchB (Human Bridge) - User escalation & feedback
   📊 Master Orchestrator - Event → Decision → Action pipeline
   🔐 Permission levels - Observe/Alert/Analyze/Isolate/Auto-Respond
+  💬 Ollama Chat - Interactive local AI for security analysis [NEW!]
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 QUICK START:
-  1. enable              (select: 1-5 to enable all)
-  2. orch_stats          (see orchestrator status)
-  3. set_perms           (set your permission level)
+  1. enable              (select: 1-5 for all widgets, then 6 for Ollama)
+  2. chat                (start interactive AI chat)
+  3. events              (see live security events)
   4. action              (execute widget action)
+
+CHAT EXAMPLES:
+  - "Analyze unauthorized port access on my system"
+  - "What are the risks of this network activity?"
+  - "Help me understand this security event"
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ROADMAP:
-  v1.0 (NOW)      - Multi-agent orchestration ✅
-  v1.1 (Q1 2026)  - CrewAI integration, Ollama inference
+  v1.0 (NOW)      - Multi-agent orchestration + Ollama ✅
+  v1.1 (Q1 2026)  - CrewAI integration, chat history
   v2.0 (H2 2026)  - Community widgets, marketplace
 
-DOCS: https://github.com/ArchieGate/archie-guardian
+DOCS: [https://github.com/ArchieGate/archie-guardian](https://github.com/ArchieGate/archie-guardian)
     """)
 
 def interactive_cli():
     """Interactive CLI loop."""
     while True:
         main_menu()
-        choice = input("Enter command (0-9): ").strip().lower()
+        choice = input("Enter command (0-9, 10): ").strip().lower()
         
         if choice in ["1", "status"]:
             show_status()
@@ -637,6 +668,9 @@ def interactive_cli():
         
         elif choice in ["9", "help"]:
             show_help()
+        
+        elif choice in ["10", "chat"]:
+            interactive_chat()
         
         elif choice in ["0", "quit", "exit"]:
             print("\n🛑 Shutting down Archie Guardian...")
