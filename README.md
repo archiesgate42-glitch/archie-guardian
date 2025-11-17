@@ -18,7 +18,7 @@ The system follows a **4-layer design**:
 ┌─────────────────────────────────────────────┐
 │   User Interface (CLI + Interactive Chat)   │
 ├─────────────────────────────────────────────┤
-│  OrchA (AI Master) + OrchB (Human-Facing)  │
+│  OrchA (AI Master) + OrchB (Human-Facing)   │
 ├─────────────────────────────────────────────┤
 │  Ollama (Local Llama3 LLM Inference) [NEW!] │
 ├─────────────────────────────────────────────┤
@@ -257,12 +257,12 @@ Define what Guardian is allowed to do:
 
 **Resource Profile (all widgets active):**
 
-| Component | CPU | RAM | Notes |
-|-----------|-----|-----|-------|
-| Core (OrchA+B) | 2-5% | 50-100 MB | Idle baseline |
-| Ollama (inference) | 20-40% | 500MB-4GB | During chat/analysis |
-| Widgets (all 5) | 2-3% | 80 MB | Lightweight monitoring |
-| **Total** | **8-20%** | **700MB-4.2GB** | Smooth on modern machines |
+|      Component     |    CPU    |       RAM       |            Notes          |
+|--------------------|-----------|-----------------|---------------------------|
+|   Core (OrchA+B)   |    2-5%   |    50-100 MB    |        Idle baseline      |
+| Ollama (inference) |   20-40%  |    500MB-4GB    |     During chat/analysis  |
+|   Widgets (all 5)  |    2-3%   |      80 MB      |   Lightweight monitoring  |
+|      **Total**     | **8-20%** | **700MB-4.2GB** | Smooth on modern machines |
 
 **Tested on:** AMD Ryzen 7 7730U + 32GB RAM (smooth performance)
 
