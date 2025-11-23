@@ -12,8 +12,8 @@ Guardian uses a numbered menu system. Run and follow the prompts:
 python guardian.py
 
 ╔════════════════════════════════════════════════════╗
-║     ARCHIE GUARDIAN v1.0 - MAIN MENU              ║
-║  Widget Manager + Multi-Agent Orchestration       ║
+║     ARCHIE GUARDIAN v1.0 - MAIN MENU               ║
+║  Widget Manager + Multi-Agent Orchestration        ║
 ╚════════════════════════════════════════════════════╝
 
 Commands:
