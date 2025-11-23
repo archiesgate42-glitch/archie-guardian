@@ -4,7 +4,7 @@
 
 > **Local. Transparent. AI-Driven Security.**
 
-Real-time system monitoring with **File Integrity**, **Process Monitor**, **Network Sniffer** widgets + **Local AI Chat** powered by Ollama (Llama3).
+Real-time system monitoring with **File Integrity**, **Process Monitor**, **Network Sniffer** widgets + **Local AI Chat** powered by Ollama (Llama3) + **Web UI Dashboard** (Beta).
 
 ---
 
@@ -12,26 +12,31 @@ Real-time system monitoring with **File Integrity**, **Process Monitor**, **Netw
 
 ![Architecture Diagram](assets/architecture-diagram.png)
 
-The system follows a **4-layer design**:
+The system follows a **4-layer design with dual interfaces**:
 
 ```
 ┌─────────────────────────────────────────────┐
-│   User Interface (CLI + Interactive Chat)   │
+│   User Interface (CLI + Web Dashboard)      │
 ├─────────────────────────────────────────────┤
 │  OrchA (AI Master) + OrchB (Human-Facing)   │
 ├─────────────────────────────────────────────┤
-│  Ollama (Local Llama3 LLM Inference) [NEW!] │
+│  Ollama (Local Llama3 LLM Inference)        │
 ├─────────────────────────────────────────────┤
-│  File | Process | Network | Ollama Widgets  │
+│  File | Process | Network | Defender | RRNC │
+│  Ollama Chat Widget                          │
 └─────────────────────────────────────────────┘
 ```
-![status](https://img.shields.io/badge/status-MVP%20v0.3-blue)
+
+![status](https://img.shields.io/badge/status-MVP%20v1.0-blue)
 ![python](https://img.shields.io/badge/python-3.9%2B-brightgreen)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![stars](https://img.shields.io/github/stars/archiesgate42-glitch/archie-guardian?style=flat)
+
 ---
 
 ## 🚀 Quick Start
+
+### Option 1: CLI Interface (Stable)
 
 ```bash
 # Clone & setup
@@ -42,7 +47,7 @@ python -m venv venv
 # source venv/bin/activate  # Linux/Mac
 pip install -r requirements.txt
 
-# Install Ollama (optional but highly recommended for AI features)
+# Install Ollama (optional but recommended)
 # Download from: https://ollama.ai
 
 # Start Guardian
@@ -57,12 +62,6 @@ python guardian.py
    ✅ Core imports successful
 [2/7] Checking widget system...
    ✅ Widget system ready (6/6 widgets available)
-   ✅ file_integrity loaded
-   ✅ process_monitor loaded
-   ✅ network_sniffer loaded
-   ✅ windows_defender loaded
-   ✅ rrnc loaded
-   ✅ ollama_chat loaded
 [3/7] Initializing audit logger...
    ✅ Audit logger initialized (logs/audit.log)
 [4/7] Initializing widget instances...
@@ -74,6 +73,23 @@ python guardian.py
 [7/7] CLI interface ready...
    ✅ All systems operational
 ```
+
+### Option 2: Web UI Dashboard (Beta - Work in Progress)
+
+```bash
+# Terminal 1: Start Guardian backend
+python guardian.py
+
+# Terminal 2: Start Web UI
+python guardian_api.py
+# Or use the unified launcher:
+python start_ui.py
+
+# Open browser
+http://localhost:5000
+```
+
+**⚠️ UI Status:** Currently in active development. Widget controls and real-time updates are being refined. CLI remains fully functional.
 
 ---
 
@@ -88,7 +104,35 @@ python guardian.py
 | **Network Sniffer** | ✅ LIVE | Log established connections, process-to-IP mapping (no root needed!) |
 | **Windows Defender** | ✅ LIVE | Integration with Windows security scans |
 | **RRNC** | ✅ LIVE | Rapid Response Neutralize & Capture for threat mitigation |
-| **Ollama Chat** | ✅ NEW | Local AI (Llama3) for security analysis & interactive chat |
+| **Ollama Chat** | ✅ LIVE | Local AI (Llama3) for security analysis & interactive chat |
+
+### 🌐 Dual Interface
+
+**CLI (Command Line Interface)** - Production Ready ✅
+- Full widget control and management
+- Interactive Ollama chat
+- Real-time event streaming
+- Audit log access
+- Permission management
+- Complete orchestrator statistics
+
+**Web Dashboard** - Beta (Work in Progress) 🚧
+- Visual widget status indicators
+- Real-time log streaming
+- AI chat interface
+- Widget start/stop controls (in development)
+- System health monitoring
+- Modern responsive design
+
+**Current UI Development Status:**
+- ✅ Dashboard layout and design
+- ✅ Real-time log streaming
+- ✅ Widget status display
+- ✅ AI chat interface
+- 🚧 Widget control buttons (debugging in progress)
+- 🚧 Widget toggle functionality (API integration)
+- 📋 Planned: Advanced analytics dashboard
+- 📋 Planned: Historical event timeline
 
 ### 🧠 AI-Driven Analysis
 
@@ -97,14 +141,15 @@ python guardian.py
 - **Ollama Integration:** Local LLM inference for security event analysis (no cloud!)
 - **Tech-Human Translator:** Converts technical findings → plain English alerts
 
-### 💬 New: Interactive Ollama Chat [v1.0]
+### 💬 Interactive Ollama Chat [v1.0]
 
 Ask Guardian's AI questions directly:
 - "Analyze this suspicious network activity"
 - "What does this security event mean?"
 - "Help me understand file integrity alerts"
-- Real-time responses without leaving the CLI
+- Real-time responses without leaving the interface
 - Full chat history maintained per session
+- Available in both CLI and Web UI
 
 ### 🔒 Privacy & Control
 
@@ -113,6 +158,7 @@ Ask Guardian's AI questions directly:
 - ✅ **Granular Permissions:** Observe → Alert → Analyze → Isolate → Auto-Respond
 - ✅ **Audit Trail:** Complete history of all actions
 - ✅ **Optional AI:** Enable/disable Ollama as a widget
+- ✅ **Dual Interface:** Choose CLI or Web UI based on preference
 
 ---
 
@@ -128,11 +174,11 @@ Ask Guardian's AI questions directly:
  7. orch_stats  - Show orchestrator statistics
  8. set_perms   - Set user permission level
  9. help        - Show help
-10. chat        - Interactive Ollama chat [NEW!]
+10. chat        - Interactive Ollama chat
  0. quit        - Exit Guardian
 ```
 
-### Example Session
+### Example CLI Session
 
 ```
 Enter command (0-9, 10): 2
@@ -147,7 +193,7 @@ Available widgets:
   5. rrnc                 [⭕ Disabled]
   6. ollama_chat          [⭕ Disabled]
 
-Select widget(s) (e.g. 1,2,3 or 1-3 or just 1): 1-5
+Select widget(s) (e.g. 1,2,3 or 1-3 or just 1): 1-6
    🟢 File Integrity Widget: Monitoring 2 paths
 ✅ file_integrity enabled
    🟢 Process Monitor Widget started
@@ -158,15 +204,10 @@ Select widget(s) (e.g. 1,2,3 or 1-3 or just 1): 1-5
 ✅ windows_defender enabled
    🟢 RRNC activated
 ✅ rrnc enabled
-
-✅ Enabled 5 widget(s)
-
-Enter command (0-9, 10): 6
-🟢 ollama_chat          [⭕ Disabled]
-
-Select widget(s) (e.g. 1,2,3 or 1-3 or just 1): 6
    🟢 Ollama Chat Widget: Llama3:latest ready
 ✅ ollama_chat enabled
+
+✅ Enabled 6 widget(s)
 
 Enter command (0-9, 10): 10
 
@@ -203,9 +244,59 @@ Monitor these patterns and Guardian will help you respond quickly.
 
 ---
 
+## 🌐 Web UI Features (Beta)
+
+The web dashboard provides a modern, visual interface for Guardian:
+
+### Current Features ✅
+
+**Dashboard Overview**
+- Real-time system status
+- Widget state indicators (F-I, P-M, N-S, W-D, RR, AI-M)
+- Live log streaming
+- Model selection (Llama3.1)
+
+**AI Chat Interface**
+- Chat with Guardian's AI directly in browser
+- System prompt context for security-focused responses
+- Chat history display
+- Clean, modern interface
+
+**Log Viewer**
+- Real-time log streaming
+- Color-coded log levels
+- Auto-scrolling
+- Historical log access
+
+### In Development 🚧
+
+**Widget Control Panel**
+- Start/Stop widget buttons (API integration in progress)
+- Real-time status updates
+- Widget configuration
+- Performance metrics
+
+**Advanced Features** (Planned)
+- Event timeline visualization
+- Threat correlation dashboard
+- Historical analytics
+- Custom alert rules
+- Multi-machine monitoring
+
+### Known Issues
+
+- Widget start/stop buttons currently under development
+- Some API endpoints being refined for better reliability
+- UI state synchronization improvements in progress
+
+**Note:** CLI interface remains fully functional and stable for production use while web UI is being perfected.
+
+---
+
 ## 📦 Requirements
 
 - **Python 3.9+**
+- **Flask** — Web framework for UI
 - **psutil** — Process monitoring
 - **watchdog** — File system events
 - **requests** — HTTP for Ollama API
@@ -261,8 +352,9 @@ Define what Guardian is allowed to do:
 |--------------------|-----------|-----------------|---------------------------|
 |   Core (OrchA+B)   |    2-5%   |    50-100 MB    |        Idle baseline      |
 | Ollama (inference) |   20-40%  |    500MB-4GB    |     During chat/analysis  |
-|   Widgets (all 5)  |    2-3%   |      80 MB      |   Lightweight monitoring  |
-|      **Total**     | **8-20%** | **700MB-4.2GB** | Smooth on modern machines |
+|   Widgets (all 6)  |    2-3%   |      80 MB      |   Lightweight monitoring  |
+|   Web UI (Flask)   |    1-2%   |      50 MB      |   Development server      |
+|      **Total**     | **8-22%** | **750MB-4.3GB** | Smooth on modern machines |
 
 **Tested on:** AMD Ryzen 7 7730U + 32GB RAM (smooth performance)
 
@@ -276,25 +368,31 @@ Define what Guardian is allowed to do:
 - ✅ Network Sniffer Widget
 - ✅ Windows Defender Widget
 - ✅ RRNC (Rapid Response) Widget
-- ✅ Ollama Chat Widget [NEW!]
+- ✅ Ollama Chat Widget
 - ✅ OrchA + OrchB orchestration
 - ✅ Interactive CLI
 - ✅ Audit logging
 - ✅ Multi-agent system
+- ✅ Web UI Dashboard (Beta)
 
 ### v1.1 (Q1 2026) 🎯
-- Chat history persistence
+- Complete Web UI widget controls
+- Real-time widget status synchronization
+- Chat history persistence (both CLI & UI)
 - CrewAI integration (enhanced orchestration)
 - Hot-reload widgets
 - Advanced threat patterns
+- Historical analytics dashboard
 - Community widget contributions
 
 ### v2.0 (H2 2026) 🌟
-- TUI dashboard (terminal UI)
+- Production-ready Web UI
+- Enhanced TUI dashboard (terminal UI)
 - Additional widgets (Resource Drain, Registry Watch, Crypto Detector)
 - Widget marketplace
 - Multi-machine telemetry (optional)
 - Fine-tuned LLM models for security domains
+- Mobile companion app
 - Governance & community roadmap
 
 ---
@@ -362,11 +460,12 @@ Drop your widget in `/widgets/` and Guardian auto-loads it!
 
 ## 📖 Documentation
 
-- **[Architecture Deep Dive](./ARCHITECTURE.md)** — Design patterns, multi-agent orchestration, CrewAI
+- **[Architecture Deep Dive](./ARCHITECTURE.md)** — Design patterns, multi-agent orchestration
 - **[CLI Reference](./docs/CLI.md)** — Complete command reference
 - **[Widget Development](./docs/WIDGETS.md)** — Build custom sensors
 - **[Permission Model](./docs/PERMISSIONS.md)** — Security & audit trails
 - **[Ollama Integration](./docs/OLLAMA.md)** — Setup & customization
+- **[Web UI Guide](./docs/WEB_UI.md)** — Dashboard usage & development
 
 ---
 
@@ -389,8 +488,11 @@ A: v1.0 uses Ollama (Llama3), v1.1+ will support LM Studio, HuggingFace models, 
 **Q: Is this a replacement for antivirus?**  
 A: No. Guardian does *behavioral monitoring & anomaly detection*. Use it alongside traditional antivirus.
 
+**Q: Should I use CLI or Web UI?**  
+A: CLI is production-ready and fully featured. Web UI is in beta—great for visualization but widget controls are being refined. Choose based on your comfort level!
+
 **Q: What's the learning curve?**  
-A: Minimal. Run `python guardian.py` → `2` → select widgets → `1` for status. Advanced tuning is optional.
+A: Minimal. Run `python guardian.py` → `2` → select widgets → `1` for status. Web UI provides visual alternative. Advanced tuning is optional.
 
 **Q: Does Ollama run automatically?**  
 A: Ollama runs as a service (Windows/Mac/Linux). Guardian auto-connects when you enable the ollama_chat widget.
@@ -401,13 +503,16 @@ A: Open an [Issue](https://github.com/archiesgate42-glitch/archie-guardian/issue
 **Q: Can I contribute widgets?**  
 A: Yes! See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 
+**Q: Why is the Web UI in beta?**  
+A: We're refining the widget control API and real-time synchronization. The UI works great for monitoring and chat—interactive controls are the last piece being polished!
+
 ---
 
 ## 🎯 What's Next?
 
 1. **Star the repo** ⭐ (helps us grow!)
-2. **Try v1.0** — Run `python guardian.py` and test the widgets
-3. **Enable Ollama** — Ask the AI questions directly in CLI
+2. **Try v1.0** — Run `python guardian.py` or try the Web UI!
+3. **Enable Ollama** — Ask the AI questions directly
 4. **Share feedback** — What would YOU monitor?
 5. **Contribute** — Build a custom widget!
 6. **Spread the word** — Tweet, blog, discuss!
@@ -436,20 +541,23 @@ Archie Guardian embodies three principles:
 ## 🎓 Tech Stack
 
 - **Python 3.9+** — Core language
+- **Flask** — Web framework for UI
 - **psutil** — System monitoring
 - **watchdog** — File system events
 - **requests** — Ollama API communication
 - **Ollama + Llama3** — Local LLM inference
 - **CrewAI** — Multi-agent orchestration (v1.1+)
+- **HTML/CSS/JS** — Modern web dashboard
 
 ---
 
 ## 📈 Stats
 
 - ⭐ **GitHub Stars:** Growing community
-- 🚀 **v1.0 Release:** Production-ready
+- 🚀 **v1.0 Release:** Production-ready CLI + Beta Web UI
 - 🤖 **AI Integration:** Ollama + Llama3
 - 📊 **6 Widgets:** File, Process, Network, Defender, RRNC, Chat
+- 🌐 **Dual Interface:** CLI + Web Dashboard
 - 🔒 **100% Local:** Zero cloud dependencies
 
 ---
@@ -462,7 +570,8 @@ Archie Guardian embodies three principles:
 
 ## 🔗 Quick Links
 
-- Repository: https://github.com/archiesgate42-glitch/archie-guardian
-- Download Ollama: https://ollama.ai
-- Report Issues: https://github.com/archiesgate42-glitch/archie-guardian/issues
-- Discussions: https://github.com/archiesgate42-glitch/archie-guardian/discussions
+- Repository: [https://github.com/archiesgate42-glitch/archie-guardian](https://github.com/archiesgate42-glitch/archie-guardian)
+- Download Ollama: [https://ollama.ai](https://ollama.ai)
+- Report Issues: [https://github.com/archiesgate42-glitch/archie-guardian/issues](https://github.com/archiesgate42-glitch/archie-guardian/issues)
+- Discussions: [https://github.com/archiesgate42-glitch/archie-guardian/discussions](https://github.com/archiesgate42-glitch/archie-guardian/discussions)
+- Web UI Demo: `python start_ui.py` → http://localhost:5000
