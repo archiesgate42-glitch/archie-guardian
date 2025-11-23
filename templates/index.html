@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archie Guardian - UI Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Error Banner -->
+    <div id="error-message" class="error-banner" style="display: none;"></div>
+
+    <!-- Top Section: Model Selection + Color Indicators -->
+    <section id="top-section" class="top-section">
+        <div class="top-content">
+            <!-- Left: Branding/Model Selection -->
+            <div class="branding-section">
+                <div class="logo-container">
+                    <img src="/assets/logo-arc_guard.png" alt="Archie Guardian" class="logo-image" id="main-logo">
+                    <div class="logo-text">ARCH GUARDIAN</div>
+                </div>
+                <div class="model-selector" id="model-selector">
+                    <img src="/assets/logo-llama.jpg" alt="Model" class="model-icon" id="model-logo">
+                    <div class="model-name" id="model-name">Llama3.1</div>
+                </div>
+            </div>
+
+            <!-- Right: Widget Status Indicators -->
+            <div class="widget-indicators" id="widget-indicators">
+                <h3>WIDGET STATUS</h3>
+                <div class="widget-grid" id="widget-grid">
+                    <!-- Widget cards will be dynamically generated -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Area -->
+    <div class="main-container">
+        <!-- Left Section: Overview and Live Data -->
+        <section id="left-section" class="left-section">
+            <h2>Overzicht en live gegevens van de Archie Guardian, Widgets en processen</h2>
+            <div class="terminal-output" id="terminal-output">
+                <div class="terminal-header">
+                    ARCHIE GUARDIAN v1.0 - Local AI Security + Multi-Agent Orchestration + Ollama
+                </div>
+                <div class="terminal-content" id="terminal-content">
+                    <!-- Logs will be streamed here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Section: Output Chat Window -->
+        <section id="right-section" class="right-section">
+            <h2>Output chatvenster</h2>
+            <div class="chat-output" id="chat-output">
+                <!-- Chat messages will appear here -->
+            </div>
+        </section>
+    </div>
+
+    <!-- Bottom Section: Input Chat Window -->
+    <section id="bottom-section" class="bottom-section">
+        <h2>Input Chatvenster</h2>
+        <div class="chat-input-container">
+            <input 
+                type="text" 
+                id="user-input" 
+                class="chat-input" 
+                placeholder="Type je bericht hier..."
+                autocomplete="off"
+            >
+            <button id="send-btn" class="send-button">Verstuur</button>
+        </div>
+    </section>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
+

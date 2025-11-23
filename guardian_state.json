@@ -1,0 +1,36 @@
+{
+  "timestamp": "2025-11-22T20:32:26.195798",
+  "status": "running",
+  "widgets": {
+    "file_integrity": {
+      "enabled": false,
+      "status": "idle",
+      "last_update": "2025-11-22T20:32:26.195798"
+    },
+    "process_monitor": {
+      "enabled": false,
+      "status": "idle",
+      "last_update": "2025-11-22T20:32:26.195798"
+    },
+    "network_sniffer": {
+      "enabled": false,
+      "status": "idle",
+      "last_update": "2025-11-22T20:32:26.195798"
+    },
+    "windows_defender": {
+      "enabled": false,
+      "status": "idle",
+      "last_update": "2025-11-22T20:32:26.195798"
+    },
+    "rrnc": {
+      "enabled": false,
+      "status": "idle",
+      "last_update": "2025-11-22T20:32:26.195798"
+    },
+    "ollama_chat": {
+      "enabled": false,
+      "status": "idle",
+      "last_update": "2025-11-22T20:32:26.195798"
+    }
+  }
+}

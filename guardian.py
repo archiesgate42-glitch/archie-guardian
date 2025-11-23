@@ -79,6 +79,96 @@ def log_event(event_type, details):
     except:
         pass
 
+def export_state():
+    """Export current widget state to JSON for UI"""
+    try:
+        state_data = {
+            'timestamp': datetime.now().isoformat(),
+            'status': 'running',
+            'widgets': {}
+        }
+        
+        # Export each widget's state
+        for widget_name in widget_state.keys():
+            is_enabled = widget_state.get(widget_name, False)
+            widget_instance = widgets_instances.get(widget_name)
+            
+            widget_info = {
+                'enabled': is_enabled,
+                'status': 'active' if is_enabled else 'idle',
+                'last_update': datetime.now().isoformat()
+            }
+            
+            # Add additional stats if widget is active
+            if is_enabled and widget_instance:
+                if hasattr(widget_instance, 'get_stats'):
+                    try:
+                        stats = widget_instance.get_stats()
+                        widget_info.update(stats)
+                    except:
+                        pass
+                
+                if hasattr(widget_instance, 'get_status'):
+                    try:
+                        status = widget_instance.get_status()
+                        widget_info.update(status)
+                    except:
+                        pass
+            
+            state_data['widgets'][widget_name] = widget_info
+        
+        # Write to JSON file
+        with open('guardian_state.json', 'w', encoding='utf-8') as f:
+            json.dump(state_data, f, indent=2)
+        
+        return state_data
+    except Exception as e:
+        print(f"⚠️  Error exporting state: {e}")
+        return None
+
+def enable_widget_cli(widget_name):
+    """Enable widget from CLI command"""
+    if widget_name not in widgets_instances:
+        print(f"❌ Widget '{widget_name}' not found")
+        return False
+    
+    if widget_state.get(widget_name, False):
+        print(f"⚠️  Widget '{widget_name}' already enabled")
+        export_state()
+        return True
+    
+    widget = widgets_instances[widget_name]
+    if hasattr(widget, 'start') and widget.start():
+        widget_state[widget_name] = True
+        log_event("WIDGET_ENABLED", widget_name)
+        print(f"✅ {widget_name} enabled")
+        export_state()
+        return True
+    else:
+        print(f"❌ Failed to enable {widget_name}")
+        return False
+
+def disable_widget_cli(widget_name):
+    """Disable widget from CLI command"""
+    if widget_name not in widgets_instances:
+        print(f"❌ Widget '{widget_name}' not found")
+        return False
+    
+    if not widget_state.get(widget_name, False):
+        print(f"⚠️  Widget '{widget_name}' already disabled")
+        export_state()
+        return True
+    
+    widget = widgets_instances[widget_name]
+    if hasattr(widget, 'stop'):
+        widget.stop()
+    
+    widget_state[widget_name] = False
+    log_event("WIDGET_DISABLED", widget_name)
+    print(f"✅ {widget_name} disabled")
+    export_state()
+    return True
+
 # Startup sequence
 try:
     print("[1/7] Checking core modules...")
@@ -118,6 +208,9 @@ try:
     
     print("[7/7] CLI interface ready...")
     print("   ✅ All systems operational\n")
+    
+    # Export initial state for UI
+    export_state()
     
 except Exception as e:
     print(f"❌ Error: {e}")
@@ -257,6 +350,7 @@ def enable_widget_menu():
                 log_event("WIDGET_ENABLED", widget_name)
                 print(f"✅ {widget_name} enabled")
                 enabled_count += 1
+                export_state()  # Export state after widget change
     
     print(f"\n✅ Enabled {enabled_count} widget(s)\n")
 
@@ -308,6 +402,7 @@ def disable_widget_menu():
         widget_state[widget_name] = False
         log_event("WIDGET_DISABLED", widget_name)
         print(f"✅ {widget_name} disabled")
+        export_state()  # Export state after widget change
     
     print()
 
@@ -694,6 +789,30 @@ def interactive_cli():
             print("❌ Unknown command. Try again.\n")
 
 if __name__ == "__main__":
+    import argparse
+    
+    # Check for CLI arguments (for UI subprocess calls)
+    parser = argparse.ArgumentParser(description='Archie Guardian')
+    parser.add_argument('--action', type=str, help='Action to perform')
+    parser.add_argument('--widget', type=str, help='Widget name')
+    
+    args = parser.parse_args()
+    
+    # Handle CLI commands from UI
+    if args.action and args.widget:
+        if args.action == 'enable_widget':
+            success = enable_widget_cli(args.widget)
+            sys.exit(0 if success else 1)
+        elif args.action == 'disable_widget':
+            success = disable_widget_cli(args.widget)
+            sys.exit(0 if success else 1)
+        else:
+            print(f"❌ Unknown action: {args.action}")
+            sys.exit(1)
+    
+    # Export initial state
+    export_state()
+    
     try:
         interactive_cli()
     except KeyboardInterrupt:
